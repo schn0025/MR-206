@@ -87,7 +87,7 @@ WHERE months_between(sysdate,datNs)/12 BETWEEN 50 AND 60
                          WHERE upper(intTpCtr) LIKE '%FORFAITAIRE%');
                          
 -- R5
---a
+--a)
 SELECT DISTINCT imtrcl AS "Immatriculation",
        months_between(sysdate,datPmc ) AS "Ancienneté",
        kmActl AS "kilométrage"
@@ -96,7 +96,7 @@ FROM LOCVEC.vehicule v
      JOIN LOCVEC.Contrat c ON c.cdVhc = v.cdVhc
 WHERE marque IN ('OPEL', 'RENAULT', 'PEUGEOT');
 
---b
+--b)
 SELECT DISTINCT imtrcl AS "Immatriculation",
        months_between(sysdate,datPmc ) AS "Ancienneté",
        kmActl AS "kilométrage"
@@ -107,8 +107,45 @@ WHERE cdMdl IN (SELECT cdMdl
                 WHERE marque IN ('OPEL', 'RENAULT', 'PEUGEOT'));
                 
 --R6
+-- je ne sais plus comment faire ajoutre un promptre pour le lefte join.
+SELECT intctg AS "Catégorie",
+       NVL2(marque ,marque || '-' || tpMdl ,'Pas de model')  AS "Modèle"
+FROM LOCVEC.categorie cat
+     left JOIN LOCVEC.modele m ON m.cdCtg = cat.cdCtg
+WHERE tpvhc = 2;
 
+-- R7
+-- a)
+SELECT nom ||' '|| prnm AS "Client"
+FROM LOCVEC.client cli
+     left JOIN LOCVEC.contrat c ON c.cdCli = cli.cdCli
+WHERE cdEmp is NULL;
+     
+-- b)
+SELECT nom ||' '|| prnm AS "Client"
+FROM LOCVEC.client cli
+WHERE cdCli not in (SELECT cdCli
+                    FROM LOCVEC.contrat);
+                    
+-- R8
+-- a)
+SELECT marque || '-' || tpMdl AS "Modèle",
+       intctg AS "Catégorie"
+FROM LOCVEC.categorie cat
+     JOIN LOCVEC.modele m ON m.cdCtg = cat.cdCtg
+     left JOIN LOCVEC.vehicule v ON m.cdMdl = v.cdMdl
+WHERE cdVhc is NULL;
 
+-- b)
+SELECT marque || '-' || tpMdl AS "Modèle",
+       intctg AS "Catégorie"
+FROM LOCVEC.categorie cat
+     JOIN LOCVEC.modele m ON m.cdCtg = cat.cdCtg
+WHERE cdMdl not in (SELECT cdMdl
+                    FROM LOCVEC.vehicule);
+
+-- R9
+-- R10
 
 
 
