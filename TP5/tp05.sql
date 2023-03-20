@@ -80,8 +80,9 @@ FROM LOCVEC.client cli
 WHERE upper(tpCtr.intTpCtr) = 'STANDARD JOUR + KM'
       AND upper(cat.intCtg) = 'STANDARD';
       
--- b) sous-requêtes avec IN
-SELECT DISTINCT cli.nom || ' ' || cli.prnm AS "Client",
+-- b) sous-requêtes avec 
+
+SELECT cli.nom || ' ' || cli.prnm AS "Client",
        NVL(cli.prfs, 'SANS PROFESSION ') AS "Profession"
 FROM LOCVEC.client cli
 WHERE cli.cdcli IN (SELECT cdcli
@@ -97,4 +98,37 @@ WHERE cli.cdcli IN (SELECT cdcli
                                     FROM LOCVEC.typeContrat
                                     WHERE upper(intTpCtr) = 'STANDARD JOUR + KM'));
 
--- b) sous-requête avec EXISTS
+-- c) sous-requête avec EXISTS
+SELECT cli.nom || ' ' || cli.prnm AS "Client",
+       NVL(cli.prfs, 'SANS PROFESSION ') AS "Profession"
+       FROM LOCVEC.client cli
+WHERE  EXISTS (SELECT NULL
+                    FROM LOCVEC.contrat cont
+                    WHERE cont.cdCli = cli.cdCli
+                         AND EXISTS (SELECT NULL
+                                     FROM LOCVEC.vehicule vhc
+                                     WHERE cont.cdVhc = vhc.cdVhc
+                                          AND EXISTS (SELECT NULL
+                                                      FROM LOCVEC.modele m
+                                                      WHERE m.cdMdl = vhc.cdMdl
+                                                            AND EXISTS (SELECT NULL
+                                                                        FROM LOCVEC.categorie ctg
+                                                                        WHERE ctg.cdCtg = m.cdCtg
+                                                                              AND upper(intCtg) = 'STANDARD')))
+                    AND EXISTS (SELECT NULL
+                                    FROM LOCVEC.typeContrat tpCtr
+                                    WHERE tpCtr.cdTpCtr = cont.cdTpCtr
+                                          AND upper(intTpCtr) = 'STANDARD JOUR + KM'));
+
+-- R44)
+SELECT cli.nom || ' ' || cli.prnm AS "Client"
+FROM LOCVEC.client cli
+WHERE NOT EXISTS (SELECT NULL
+                  FROM LOCVEC.typecontrat tp
+                  WHERE NOT EXISTS (SELECT NULL
+                                    FROM LOCVEC.conrat cont
+                                    WHERE cont.cdTpCtr = tp.cdTpCtr
+                                          AND tp.cdCli = cont.cdcli));
+
+
+
