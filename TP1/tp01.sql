@@ -145,7 +145,21 @@ WHERE cdMdl not in (SELECT cdMdl
                     FROM LOCVEC.vehicule);
 
 -- R9
+SELECT e.nom ||' '|| e.prnm AS "Employé",
+       e.qualif AS "Qualif Employé",
+       sup.nom || ' ' || sup.prnm AS "Supérieur",
+       sup.qualif AS "Qualif Supérieur"
+FROM LOCVEC.employe e
+     JOIN LOCVEC.employe sup ON sup.cdEmp = e.cdSup
+ORDER BY 2,1;
+
 -- R10
+SELECT e.nom ||' '|| e.prnm AS "Employé",
+       e.qualif AS "Qualif Employé",
+       nvl2(sup.nom, sup.nom || ' ' || sup.prnm, '***') AS "Supérieur",
+       nvl(sup.qualif,nvl2(e.datdpt,'Ancien Employe','Directeur de l’agence')) AS "Qualif Supérieur"
+FROM LOCVEC.employe e
+     left JOIN LOCVEC.employe sup ON sup.cdEmp = e.cdSup;
 
 
 
