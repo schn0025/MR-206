@@ -94,4 +94,36 @@ HAVING count(cdCtr) > (SELECT AVG(count(cdCtr))
                         GROUP BY cli.cdCli)
 GROUP BY cli.nom, cli.prnm;
 
+-- R28
+-- a) le nombre de catégories de type 1
+SELECT count(cdCtg) AS "nb. Catg"
+FROM LOCVEC.categorie
+WHERE tpVhc = '1';
 
+-- b)
+SELECT m.marque AS "Marque",
+       count(c.cdCtg) AS "nb. Catg"
+FROM LOCVEC.modele m
+     JOIN LOCVEC.categorie c ON c.cdCtg = m.cdCtg
+WHERE c.tpVhc = '1'
+GROUP BY m.marque
+ORDER BY 2 desc,1;
+
+-- c)
+SELECT m.marque AS "Marque"
+FROM LOCVEC.modele m
+     JOIN LOCVEC.categorie c ON c.cdCtg = m.cdCtg
+WHERE c.tpVhc = '1'
+GROUP BY m.marque
+HAVING count(c.cdCtg) = (SELECT count(cdCtg)
+
+                        FROM LOCVEC.categorie
+                        WHERE tpVhc = '1');
+
+-- R29
+SELECT cli.nom || ' ' || cli.prnm AS "Client"
+FROM LOCVEC.client cli
+     JOIN LOCVEC.contrat cont ON cont.cdCli = cli.cdCli
+GROUP BY cli.nom, cli.prnm
+HAVING count(distinct cdTpCtr) = (SELECT count(cdTpCtr)
+                         FROM LOCVEC.typecontrat);
