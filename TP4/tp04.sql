@@ -130,6 +130,15 @@ WHERE m.cdCtg in (SELECT cdCtg
                       FROM LOCVEC.modele
                       WHERE upper(cli.tpMdl) = 'CLIO');
       
+-- R37
+SELECT cli.nom || ' ' || cli.prnm AS "Client"
+FROM LOCVEC.client cli
+WHERE (cli.localite, cli.prfs) in (SELECT localite, prfs
+                                   FROM LOCVEC.client ml
+                                   WHERE upper(ml.nom) = 'LECOMTE'
+                                         AND upper(ml.prnm) = 'MARCELLE')
+      AND upper(cli.nom) != 'LECOMTE'
+      AND upper(cli.prnm) != 'MARCELLE';
 
 
 
