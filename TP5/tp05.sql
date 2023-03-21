@@ -126,9 +126,75 @@ FROM LOCVEC.client cli
 WHERE NOT EXISTS (SELECT NULL
                   FROM LOCVEC.typecontrat tp
                   WHERE NOT EXISTS (SELECT NULL
-                                    FROM LOCVEC.conrat cont
-                                    WHERE cont.cdTpCtr = tp.cdTpCtr
-                                          AND tp.cdCli = cont.cdcli));
+                                    FROM LOCVEC.contrat cont
+                                    WHERE cont.cdcli = cli.cdcli
+                                          AND tp.cdtpctr = cont.cdtpctr));
+                                          
+-- R45)
+SELECT level AS "Niveau",
+       LPAD(' ',(level-1)*4) || nom || ' ' || prnm AS "Employé",
+       qualif AS "Qualification"
+FROM LOCVEC.employe
+CONNECT BY PRIOR cdEmp =  cdSUP
+START WITH cdSup is NULL;
+
+-- R46)
+SELECT level AS "Niveau",
+       LPAD(' ',(level-1)*4) || nom || ' ' || prnm AS "Employé",
+       qualif AS "Qualification"
+FROM LOCVEC.employe
+WHERE datdpt IS NULL
+CONNECT BY PRIOR cdEmp =  cdSUP
+START WITH cdSup is NULL;
+
+-- R47) 
+SELECT level AS "Niveau",
+       LPAD(' ',(level-1)*4) || nom || ' ' || prnm AS "Employé",
+       qualif AS "Qualification"
+FROM LOCVEC.employe
+WHERE datdpt IS NULL
+CONNECT BY PRIOR cdEmp =  cdSUP
+START WITH upper(qualif) = 'CHEF D''ATELIER';
+
+-- R48)
+SELECT level AS "Niveau",
+       LPAD(' ',(level-1)*4) || nom || ' ' || prnm AS "Employé",
+       qualif AS "Qualification"
+FROM LOCVEC.employe
+WHERE datdpt IS NULL
+      AND cdSx = '2'
+CONNECT BY PRIOR cdEmp = cdSUP
+START WITH cdSup is NULL;
+
+-- R49)
+SELECT level AS "Niveau",
+       LPAD(' ',(level-1)*4) || nom || ' ' || prnm AS "Employé",
+       qualif AS "Qualification"
+FROM LOCVEC.employe
+WHERE datdpt IS NULL
+      AND cdSup IS NOT NULL
+      AND cdEmp NOT IN (SELECT cdEmp
+                        FROM LOCVEC.employe
+                        WHERE datdpt IS NULL
+                        CONNECT BY PRIOR cdEmp =  cdSUP
+                        START WITH upper(qualif) = 'CHEF D''ATELIER')
+CONNECT BY PRIOR cdEmp =  cdSUP
+START WITH cdSup is NULL;
+
+-- R50)
+SELECT Lpad(' ' ,4 * (Level - 1)) || nom AS "Employe",
+       cdSup , 
+       Prior nom "Nom Parent" ,
+       Connect_By_Isleaf "Noeud" ,
+       Connect_By_Root(nom) "Racine",
+       Sys_Connect_By_Path(cdEmp ,':') "Chemin"
+FROM LOCVEC.employe
+Connect By Nocycle Prior cdEmp = cdSup
+Start With cdSup IS NULL
+Order Siblings By nom;
+       
+
+
 
 
 
