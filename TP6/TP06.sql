@@ -54,3 +54,40 @@ UPDATE COMPETITION
 SET droitSinsc = droitSinsc * 1.01
 WHERE parcours = 2;
 
+-- Ex 3
+-- a)
+-- insertion de valeurs
+INSERT INTO MONITEUR
+VALUES ('M2', 'TORDUE', 'Paul', '20 rue Nationale', 'La NEUVILLETTE', 51100, 'M2', 1, 3);
+-- L’intégrité référentielle n'est pas respectée
+
+/* b)
+L'erreur est du a la presance d'un elt dans la table qui ne respect pas la contrainte
+*/
+ALTER TABLE MONITEUR
+ADD CONSTRAINT fk_responsable FOREIGN KEY(responsable) REFERENCES MONITEUR(cdmono);
+
+-- c)
+-- ajout de moniteur
+INSERT INTO MONITEUR (cdmono, nom, prnm, adr, ville, cp, statut, ind)
+VALUES ('M1', 'DUMAS', 'Arnaud', '13 Bd Gambetta', 'REIMS', 51100, 1, 3);
+
+-- d)
+-- ajout des valeur de personne qui ne sont pas de type 3
+-- le select ne fonction pas car il y a plus de champ et en plus ils ne sont pas dans le même ordre 
+
+INSERT INTO MEMBRE
+    SELECT cdpers, nom, prnm, adr, ville, cp, tpmemb, nbcoursuivis, ind
+    FROM MINIGOLF.PERSONNE
+    WHERE tpmemb != 3;
+    
+-- e)
+-- passage des nom en nom maj
+UPDATE MEMBRE
+SET nom = upper(nom);
+
+
+
+
+
+
