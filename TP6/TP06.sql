@@ -87,7 +87,77 @@ UPDATE MEMBRE
 SET nom = upper(nom);
 
 
+-- Ex 4
+--a) ecriture de REGLT_COTISATION
+CREATE TABLE REGLT_COTISATION
+(
+cdMemb          CHAR(5)     CONSTRAINT fk_cdMemb REFERENCES MEMBRE(cdMemb),
+dateRegltCot    DATE        NOT NULL,
+mntReglt     INT         NOT NULL CONSTRAINT negatif CHECK(mntReglt > 0),
+CONSTRAINT pk_affectation PRIMARY KEY (cdMemb, dateRegltCot)
+);
 
+--b)
+-- test des contraints de la table
+INSERT INTO REGLT_COTISATION
+VALUES ('M001','10/10/2003',NULL);
 
+INSERT INTO REGLT_COTISATION
+VALUES ('M001',NULL,50);
 
+INSERT INTO REGLT_COTISATION
+VALUES ('M001','10/10/2003',-5);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M000','10/10/2003',50);
+
+-- c)
+-- insertion de valeurs
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M012','25/01/2019',40);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M020','30/01/2019',20);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M005','30/01/2019',20);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M006','30/01/2019',50);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M012',TRUNC(sysdate),50);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M020',TRUNC(sysdate),60);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M005','12/02/2019',60);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M005','12/02/2019',20);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M011',TRUNC(sysdate-1),50);
+
+INSERT INTO REGLT_COTISATION
+VALUES ('M020',TRUNC(sysdate-7),20);
+
+-- d)
+
+SELECT  nom || ' ' || prnm AS "Menbre",
+        sum(MNTREGLT) AS "montant total"
+FROM membre m
+    JOIN REGLT_COTISATION r ON r.cdMemb = m.cdMemb
+GROUP BY nom, prnm;
+
+-- e)
+SELECT  nom || ' ' || prnm AS "Menbre",
+        NVL2(sum(MNTREGLT),(sum(MNTREGLT)||'€'), 'Rien Payé') AS "montant total"
+FROM membre m
+    left JOIN REGLT_COTISATION r ON r.cdMemb = m.cdMemb
+WHERE upper(ville) = 'REIMS'
+GROUP BY nom, prnm
+ORDER BY 1;
 
