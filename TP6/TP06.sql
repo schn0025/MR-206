@@ -161,3 +161,27 @@ WHERE upper(ville) = 'REIMS'
 GROUP BY nom, prnm
 ORDER BY 1;
 
+-- f)
+SELECT  nom || ' ' || prnm AS "Menbre",
+        NVL2(sum(MNTREGLT),(sum(MNTREGLT)||'€'), 'Rien Payé') AS "montant total"
+FROM membre m
+    left JOIN REGLT_COTISATION r ON r.cdMemb = m.cdMemb
+GROUP BY nom, prnm
+HAVING sum(MNTREGLT) =  (SELECT max(sum(MNTREGLT))
+                        FROM membre m
+                        left JOIN REGLT_COTISATION r ON r.cdMemb = m.cdMemb
+                        GROUP BY nom, prnm)
+ORDER BY 1;
+
+-- g)
+UPDATE reglt_cotisation
+SET MntReglt = MntReglt+10
+WHERE DateRegltCot = '02/05/23';
+
+-- h)
+DELETE
+FROM reglt_cotisation
+Where cdmemb in (SELECT cdmemb
+                FROM Membre
+                WHERE upper(ville) = 'REIMS');
+
